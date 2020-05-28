@@ -1,0 +1,17 @@
+{
+  "name": "alcool-app",
+  "displayName": "alcool-app",
+  "expo": {
+    "name": "alcool-app",
+    "slug": "expo-template-bare",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
