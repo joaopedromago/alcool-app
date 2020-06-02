@@ -37,7 +37,7 @@ application.get('/getCount', async (_request, response) => {
 
 application.post('/addCount', async (_request, response) => {
   const newUse = {
-    date: new Date(new Date().setUTCHours(-3)),
+    date: new Date(),
   };
 
   const newKey = firebase
