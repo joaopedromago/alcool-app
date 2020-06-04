@@ -1,5 +1,13 @@
 import React from 'react';
-import {SafeAreaView, StyleSheet, View, Text, StatusBar} from 'react-native';
+import {
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Text,
+  StatusBar,
+  ScrollView,
+  Button,
+} from 'react-native';
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {to} from 'nh-utils';
 import firebase from './firebase';
@@ -10,6 +18,7 @@ const countsRef = firebase.database().ref('counts');
 
 const App = () => {
   const [counts, setCounts] = React.useState([]);
+  const [state, setState] = React.useState(0);
 
   React.useEffect(async () => {
     const [_, res] = await to(countsRef.once('value'));
@@ -24,36 +33,49 @@ const App = () => {
 
   const graphData = utils.getGraphData(counts);
 
+  forceRemount = () => {
+    setState(state + 1);
+  };
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <View style={styles.body}>
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Última Limpeza</Text>
-            <Text style={styles.sectionDescription}>
-              {lastCount && `${utils.formatDate(lastCount.date)}.`}
-            </Text>
+      <ScrollView>
+        <SafeAreaView>
+          <View style={styles.body}>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Última Limpeza</Text>
+              <Text style={styles.sectionDescription}>
+                {lastCount && `${utils.formatDate(lastCount.date)}.`}
+              </Text>
+            </View>
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionTitle}>Recomendação</Text>
+              <Text style={styles.sectionDescription}>
+                {lastCount &&
+                  `É recomendado que realize a próxima limpeza as ${utils.getRecomendationDate(
+                    lastCount.date,
+                  )}.`}
+              </Text>
+            </View>
+            <View style={styles.sectionChart}>
+              <Text style={styles.sectionChartTitle}>Uso por dia</Text>
+              {!graphData ? (
+                <Text>Carregando...</Text>
+              ) : (
+                <Chart data={graphData} />
+              )}
+            </View>
+            <View style={styles.sectionContainer}>
+              <Button
+                onPress={forceRemount}
+                title="Atualizar"
+                color="#5555ff"
+                accessibilityLabel="Atualizar Dados" />
+            </View>
           </View>
-          <View style={styles.sectionContainer}>
-            <Text style={styles.sectionTitle}>Recomendação</Text>
-            <Text style={styles.sectionDescription}>
-              {lastCount &&
-                `É recomendado que realize a próxima limpeza as ${utils.getRecomendationDate(
-                  lastCount.date,
-                )}.`}
-            </Text>
-          </View>
-          <View style={styles.sectionChart}>
-            <Text style={styles.sectionChartTitle}>Uso por dia</Text>
-            {!graphData ? (
-              <Text>Carregando...</Text>
-            ) : (
-              <Chart data={graphData} />
-            )}
-          </View>
-        </View>
-      </SafeAreaView>
+        </SafeAreaView>
+      </ScrollView>
     </>
   );
 };

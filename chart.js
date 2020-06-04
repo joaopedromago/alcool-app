@@ -4,7 +4,6 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {LineChart} from 'react-native-chart-kit';
 
 const chart = ({data}) => {
-    console.log('data', data)
   return (
     <View>
       <LineChart
