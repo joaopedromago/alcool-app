@@ -1,72 +1,47 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- * @flow strict-local
- */
-
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import {SafeAreaView, StyleSheet, View, Text, StatusBar} from 'react-native';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {to} from 'nh-utils';
+import firebase from './firebase';
+import utils from './utils';
 
-import {
-  Header,
-  LearnMoreLinks,
-  Colors,
-  DebugInstructions,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const countsRef = firebase.database().ref('counts');
 
-const App: () => React$Node = () => {
+const App = () => {
+  const [counts, setCounts] = React.useState([]);
+
+  React.useEffect(async () => {
+    const [_, res] = await to(countsRef.once('value'));
+
+    const responseObj = JSON.parse(JSON.stringify(res));
+
+    const countsArray = Object.keys(responseObj).map(key => responseObj[key]);
+    setCounts(countsArray);
+  }, []);
+
+  const lastCount = counts[counts.length - 1];
+
   return (
     <>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
+        <View style={styles.body}>
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Última Limpeza</Text>
+            <Text style={styles.sectionDescription}>
+              {lastCount && `${utils.formatDate(lastCount.date)}.`}
+            </Text>
           </View>
-        </ScrollView>
+          <View style={styles.sectionContainer}>
+            <Text style={styles.sectionTitle}>Recomendação</Text>
+            <Text style={styles.sectionDescription}>
+              {lastCount &&
+                `É recomendado que realize a próxima limpeza as ${utils.getRecomendationDate(
+                  lastCount.date,
+                )}.`}
+            </Text>
+          </View>
+        </View>
       </SafeAreaView>
     </>
   );
