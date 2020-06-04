@@ -4,6 +4,7 @@ import {Colors} from 'react-native/Libraries/NewAppScreen';
 import {to} from 'nh-utils';
 import firebase from './firebase';
 import utils from './utils';
+import Chart from './chart';
 
 const countsRef = firebase.database().ref('counts');
 
@@ -20,6 +21,8 @@ const App = () => {
   }, []);
 
   const lastCount = counts[counts.length - 1];
+
+  const graphData = utils.getGraphData(counts);
 
   return (
     <>
@@ -40,6 +43,14 @@ const App = () => {
                   lastCount.date,
                 )}.`}
             </Text>
+          </View>
+          <View style={styles.sectionChart}>
+            <Text style={styles.sectionChartTitle}>Uso por dia</Text>
+            {!graphData ? (
+              <Text>Carregando...</Text>
+            ) : (
+              <Chart data={graphData} />
+            )}
           </View>
         </View>
       </SafeAreaView>
@@ -62,10 +73,19 @@ const styles = StyleSheet.create({
     marginTop: 32,
     paddingHorizontal: 24,
   },
+  sectionChart: {
+    marginTop: 32,
+  },
   sectionTitle: {
     fontSize: 24,
     fontWeight: '600',
     color: Colors.black,
+  },
+  sectionChartTitle: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: Colors.black,
+    paddingHorizontal: 24,
   },
   sectionDescription: {
     marginTop: 8,
